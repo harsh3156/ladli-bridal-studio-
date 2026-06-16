@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ladli Bridal Studio — Make Up | Skin | Hair</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;
+  --gold-light:#E8C96D;
+  --gold-pale:#F5E6C0;
+  --dark:#0A0A0A;
+  --dark2:#111111;
+  --dark3:#1A1A1A;
+  --dark4:#242424;
+  --text:#E8E0D0;
+  --text2:#A09080;
+  --pink:#D4547E;
+  --purple:#7B5EA7;
+}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:'Jost',sans-serif;overflow-x:hidden;cursor:none}
+
+/* Custom cursor */
+#cursor{position:fixed;width:12px;height:12px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.15s ease,opacity 0.3s;mix-blend-mode:difference;transform:translate(-50%,-50%)}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(201,168,76,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all 0.08s ease}
+
+/* Loading screen */
+#loader{position:fixed;inset:0;background:var(--dark);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s ease}
+#loader.hidden{opacity:0;pointer-events:none}
+.loader-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,5rem);font-weight:300;letter-spacing:0.3em;color:var(--gold);opacity:0;animation:fadeInUp 1.2s ease 0.3s forwards}
+.loader-bar{width:200px;height:1px;background:var(--dark4);margin-top:2rem;overflow:hidden;opacity:0;animation:fadeInUp 0.8s ease 0.8s forwards}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));width:0;animation:fill 2s ease 1s forwards}
+.loader-sub{font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.5em;color:var(--text2);margin-top:1rem;text-transform:uppercase;opacity:0;animation:fadeInUp 0.8s ease 1s forwards}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;transition:background 0.4s,padding 0.4s}
+nav.scrolled{background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);padding:1rem 3rem;border-bottom:1px solid rgba(201,168,76,0.15)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:0.2em;color:var(--gold);text-decoration:none}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text2);text-decoration:none;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width 0.3s}
+.nav-links a:hover{color:var(--gold)}
+.nav-links a:hover::after{width:100%}
+.nav-book{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;padding:0.7rem 1.8rem;border:1px solid var(--gold);color:var(--gold);background:transparent;cursor:none;transition:all 0.3s}
+.nav-book:hover{background:var(--gold);color:var(--dark)}
+
+/* Hero */
+#hero{min-height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero-content{position:relative;z-index:2;text-align:center;padding:2rem}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;opacity:0;animation:fadeInUp 1s ease 2.5s forwards}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,10vw,9rem);font-weight:300;line-height:0.9;letter-spacing:-0.02em;color:#fff;margin-bottom:0.5rem;overflow:hidden}
+.hero-title span{display:block;opacity:0;transform:translateY(120px);animation:slideUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-title span:nth-child(1){animation-delay:2.3s}
+.hero-title span:nth-child(2){animation-delay:2.5s;color:var(--gold);font-style:italic}
+.hero-title span:nth-child(3){animation-delay:2.7s}
+.hero-services{font-size:0.65rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--text2);margin:2rem 0;opacity:0;animation:fadeInUp 1s ease 3s forwards}
+.hero-cta{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;opacity:0;animation:fadeInUp 1s ease 3.2s forwards}
+.btn-primary{padding:1rem 3rem;background:var(--gold);color:var(--dark);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;border:none;cursor:none;font-family:'Jost',sans-serif;font-weight:500;transition:all 0.3s;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px)}
+.btn-outline{padding:1rem 3rem;background:transparent;color:var(--gold);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;border:1px solid rgba(201,168,76,0.5);cursor:none;font-family:'Jost',sans-serif;transition:all 0.3s;text-decoration:none;display:inline-block}
+.btn-outline:hover{border-color:var(--gold);transform:translateY(-2px)}
+.scroll-indicator{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeInUp 1s ease 3.5s forwards}
+.scroll-line{width:1px;height:60px;background:linear-gradient(var(--gold),transparent);animation:scrollPulse 2s ease infinite}
+.scroll-text{font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--text2)}
+
+/* Gold divider */
+.gold-divider{display:flex;align-items:center;gap:1rem;justify-content:center;margin:1.5rem 0}
+.gold-divider::before,.gold-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.gold-divider::after{background:linear-gradient(90deg,var(--gold),transparent)}
+.gold-ornament{color:var(--gold);font-size:1.2rem}
+
+/* Sections */
+section{padding:6rem 0;position:relative}
+.section-eyebrow{font-size:0.6rem;letter-spacing:0.5em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1.1}
+.section-subtitle{font-size:0.9rem;color:var(--text2);line-height:1.8;max-width:500px}
+.container{max-width:1300px;margin:0 auto;padding:0 3rem}
+
+/* About */
+#about{background:var(--dark2)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-images{position:relative;height:600px}
+.about-img-main{position:absolute;width:70%;height:75%;object-fit:cover;right:0;top:0;filter:brightness(0.85)}
+.about-img-accent{position:absolute;width:50%;height:50%;left:0;bottom:0;object-fit:cover;border:4px solid var(--dark2);filter:brightness(0.9)}
+.about-badge{position:absolute;top:30%;right:-1.5rem;background:var(--gold);color:var(--dark);padding:1.5rem;text-align:center;z-index:2;min-width:120px}
+.about-badge .num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;display:block;line-height:1}
+.about-badge .label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem}
+.stat-card{padding:1.5rem;border:1px solid rgba(201,168,76,0.15);position:relative}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:0;background:var(--gold);transition:height 0.5s ease}
+.stat-card.in-view::before{height:100%}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--gold)}
+.stat-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text2);margin-top:0.25rem}
+
+/* Services */
+#services{background:var(--dark)}
+.services-header{text-align:center;margin-bottom:4rem}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:rgba(201,168,76,0.1)}
+.service-card{background:var(--dark);padding:3rem 2.5rem;position:relative;overflow:hidden;transition:background 0.4s;cursor:none}
+.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.05),transparent);opacity:0;transition:opacity 0.4s}
+.service-card:hover{background:var(--dark2)}
+.service-card:hover::before{opacity:1}
+.service-icon{width:56px;height:56px;border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:2rem;transition:border-color 0.3s}
+.service-card:hover .service-icon{border-color:var(--gold)}
+.service-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.service-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;margin-bottom:0.75rem}
+.service-desc{font-size:0.85rem;color:var(--text2);line-height:1.8;margin-bottom:1.5rem}
+.service-price{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold)}
+.service-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.3rem 0.8rem;border:1px solid rgba(201,168,76,0.2);color:var(--text2);margin-bottom:1rem}
+
+/* Team */
+#team{background:var(--dark2)}
+.team-header{text-align:center;margin-bottom:4rem}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.team-card{position:relative;overflow:hidden;cursor:none}
+.team-img-wrap{height:400px;overflow:hidden;position:relative}
+.team-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s ease;filter:brightness(0.85) grayscale(0.2)}
+.team-card:hover .team-img-wrap img{transform:scale(1.06)}
+.team-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:2rem 1.5rem;transform:translateY(20px);transition:transform 0.4s}
+.team-card:hover .team-overlay{transform:translateY(0)}
+.team-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400}
+.team-role{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-top:0.25rem}
+.team-placeholder{width:100%;height:400px;background:var(--dark3);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.team-avatar{width:80px;height:80px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center}
+.team-avatar svg{width:40px;height:40px;stroke:var(--gold);fill:none;stroke-width:1}
+
+/* Gallery / Before After */
+#gallery{background:var(--dark)}
+.gallery-header{text-align:center;margin-bottom:4rem}
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto;gap:1.5px;background:rgba(201,168,76,0.1)}
+.gallery-item{overflow:hidden;position:relative;cursor:none}
+.gallery-item:nth-child(1){grid-column:span 2;grid-row:span 2}
+.gallery-placeholder{width:100%;height:280px;background:var(--dark3);display:flex;align-items:center;justify-content:center;transition:background 0.4s}
+.gallery-item:nth-child(1) .gallery-placeholder{height:100%;min-height:560px}
+.gallery-placeholder:hover{background:var(--dark4)}
+.gallery-placeholder img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-label{position:absolute;bottom:1rem;left:1rem;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);background:rgba(0,0,0,0.6);padding:0.4rem 0.8rem;backdrop-filter:blur(10px)}
+.gallery-icon svg{width:32px;height:32px;stroke:rgba(201,168,76,0.3);fill:none}
+
+/* Testimonials */
+#testimonials{background:var(--dark2);overflow:hidden}
+.testimonials-header{text-align:center;margin-bottom:4rem}
+.testimonials-track{display:flex;gap:2rem;animation:scrollTestimonials 30s linear infinite}
+.testimonials-track:hover{animation-play-state:paused}
+.testimonial-card{min-width:380px;background:var(--dark3);padding:2.5rem;border:1px solid rgba(201,168,76,0.1);position:relative;flex-shrink:0}
+.testimonial-card::before{content:'\201C';font-family:'Cormorant Garamond',serif;font-size:5rem;color:var(--gold);opacity:0.2;position:absolute;top:-0.5rem;left:1.5rem;line-height:1}
+.testimonial-stars{display:flex;gap:0.25rem;margin-bottom:1rem}
+.star{color:var(--gold);font-size:0.8rem}
+.testimonial-text{font-size:0.9rem;color:var(--text2);line-height:1.8;margin-bottom:1.5rem;font-style:italic}
+.testimonial-author{font-size:0.8rem;font-weight:500;color:var(--text)}
+.testimonial-service{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-top:0.2rem}
+
+/* Booking */
+#booking{background:var(--dark);position:relative;overflow:hidden}
+#booking::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,168,76,0.04) 0%,transparent 70%)}
+.booking-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.booking-info{padding-top:2rem}
+.booking-form{background:var(--dark2);padding:3rem;border:1px solid rgba(201,168,76,0.1)}
+.form-group{margin-bottom:1.5rem}
+.form-label{display:block;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--dark3);border:1px solid rgba(201,168,76,0.15);color:var(--text);padding:0.85rem 1rem;font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.3s;appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold)}
+.form-textarea{resize:none;height:120px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn-submit{width:100%;padding:1.1rem;background:var(--gold);color:var(--dark);font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;border:none;cursor:none;font-weight:500;transition:all 0.3s;margin-top:1rem}
+.btn-submit:hover{background:var(--gold-light)}
+.booking-features{margin-top:2.5rem;display:flex;flex-direction:column;gap:1rem}
+.booking-feature{display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:var(--text2)}
+.booking-feature svg{width:18px;height:18px;stroke:var(--gold);fill:none;flex-shrink:0}
+
+/* Contact */
+#contact{background:var(--dark2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem}
+.contact-info{display:flex;flex-direction:column;gap:2rem}
+.contact-item{display:flex;gap:1.5rem;align-items:flex-start}
+.contact-icon{width:44px;height:44px;border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-icon svg{width:18px;height:18px;stroke:var(--gold);fill:none}
+.contact-label{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.25rem}
+.contact-value{font-size:0.9rem;color:var(--text2);line-height:1.7}
+.social-links{display:flex;gap:1rem;margin-top:2rem}
+.social-link{width:44px;height:44px;border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;transition:all 0.3s;text-decoration:none}
+.social-link:hover{border-color:var(--gold);background:var(--gold)}
+.social-link:hover svg{stroke:var(--dark)}
+.social-link svg{width:18px;height:18px;stroke:var(--gold);fill:none;transition:stroke 0.3s}
+.map-container{background:var(--dark3);height:100%;min-height:400px;border:1px solid rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.map-placeholder{text-align:center}
+.map-pin{width:60px;height:60px;border:1px solid rgba(201,168,76,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.map-pin svg{width:24px;height:24px;stroke:var(--gold);fill:none}
+.map-address{font-size:0.8rem;color:var(--text2);line-height:1.8}
+.map-address strong{color:var(--gold);font-weight:400}
+
+/* Footer */
+footer{background:var(--dark);border-top:1px solid rgba(201,168,76,0.1);padding:3rem 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;letter-spacing:0.2em;color:var(--gold)}
+.footer-copy{font-size:0.7rem;color:var(--text2);letter-spacing:0.1em}
+.footer-links{display:flex;gap:2rem}
+.footer-links a{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text2);text-decoration:none;transition:color 0.3s}
+.footer-links a:hover{color:var(--gold)}
+
+/* Animations */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fill{to{width:100%}}
+@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(0.5);transform-origin:top}50%{opacity:1;transform:scaleY(1)}}
+@keyframes scrollTestimonials{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes sparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity 0.8s ease,transform 0.8s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity 0.8s ease,transform 0.8s ease}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.delay-1{transition-delay:0.1s}
+.delay-2{transition-delay:0.2s}
+.delay-3{transition-delay:0.3s}
+.delay-4{transition-delay:0.4s}
+.delay-5{transition-delay:0.5s}
+
+/* 3D card tilt effect */
+.tilt{transform-style:preserve-3d;transform:perspective(1000px)}
+
+/* Glassmorphism */
+.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(201,168,76,0.1)}
+
+/* Floating label */
+.floating-badge{position:fixed;bottom:2rem;right:2rem;background:var(--gold);color:var(--dark);padding:0.8rem 1.5rem;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;font-weight:500;z-index:200;cursor:none;transition:all 0.3s;animation:fadeInUp 1s ease 4s both}
+.floating-badge:hover{background:var(--gold-light);transform:translateY(-3px)}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .container{padding:0 1.5rem}
+  section{padding:4rem 0}
+  .about-grid,.booking-grid,.contact-grid{grid-template-columns:1fr;gap:2rem}
+  .services-grid{grid-template-columns:1fr}
+  .team-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr 1fr}
+  .gallery-item:nth-child(1){grid-column:span 2;grid-row:auto}
+  .gallery-item:nth-child(1) .gallery-placeholder{min-height:280px}
+  .about-images{height:350px}
+  .footer-inner{flex-direction:column;gap:1.5rem;text-align:center}
+  .footer-links{flex-wrap:wrap;justify-content:center}
+  .hero-cta{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-logo">LADLI</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-sub">Bridal Studio · Est. Surat</div>
+</div>
+
+<!-- Nav -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">L B S</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-book" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book Now</button>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <p class="hero-eyebrow">✦ Surat's Premier Bridal Destination ✦</p>
+    <h1 class="hero-title">
+      <span>Ladli</span>
+      <span>Bridal</span>
+      <span>Studio</span>
+    </h1>
+    <div class="gold-divider" style="max-width:400px;margin:1.5rem auto"><div class="gold-ornament">◆</div></div>
+    <p class="hero-services">Make Up &nbsp;·&nbsp; Skin &nbsp;·&nbsp; Hair</p>
+    <div class="hero-cta">
+      <a href="#booking" class="btn-primary">Book Your Session</a>
+      <a href="#services" class="btn-outline">Our Services</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-images reveal-left">
+        <div class="about-img-main" style="background:var(--dark3);width:70%;height:75%;position:absolute;right:0;top:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span style="font-size:0.7rem;letter-spacing:0.3em;color:var(--text2)">STUDIO INTERIOR</span>
+        </div>
+        <div class="about-img-accent" style="background:var(--dark4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span style="font-size:0.6rem;letter-spacing:0.2em;color:var(--text2)">WORKSPACE</span>
+        </div>
+        <div class="about-badge">
+          <span class="num">5.0</span>
+          <span class="label">Google Rating</span>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <p class="section-eyebrow">Our Story</p>
+        <h2 class="section-title" style="margin-bottom:1.5rem">Where Beauty<br><em style="color:var(--gold);font-style:italic">Meets Artistry</em></h2>
+        <div class="gold-divider" style="justify-content:flex-start;max-width:200px"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+        <p class="section-subtitle" style="margin-top:1.5rem">Located in the heart of Katargam, Surat, Ladli Bridal Studio is a sanctuary of beauty dedicated to making every bride's dream look a reality. With expert artists trained in modern and traditional techniques, we craft transformations that last a lifetime.</p>
+        <p class="section-subtitle" style="margin-top:1rem">From flawless bridal makeup to luxurious hair treatments and advanced skin care — every service is delivered with precision, passion, and the warmth of a boutique experience.</p>
+        <div class="about-stats">
+          <div class="stat-card reveal delay-1">
+            <div class="stat-num">96+</div>
+            <div class="stat-label">5-Star Reviews</div>
+          </div>
+          <div class="stat-card reveal delay-2">
+            <div class="stat-num">500+</div>
+            <div class="stat-label">Brides Served</div>
+          </div>
+          <div class="stat-card reveal delay-3">
+            <div class="stat-num">30+</div>
+            <div class="stat-label">Services Offered</div>
+          </div>
+          <div class="stat-card reveal delay-4">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Premium Products</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services">
+  <div class="container">
+    <div class="services-header reveal">
+      <p class="section-eyebrow">What We Offer</p>
+      <h2 class="section-title">Our Signature<br><em style="color:var(--gold);font-style:italic">Services</em></h2>
+      <div class="gold-divider" style="max-width:300px;margin:1rem auto"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+    </div>
+    <div class="services-grid">
+      <!-- Bridal Packages -->
+      <div class="service-card tilt reveal delay-1">
+        <span class="service-tag">Signature</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM12 6c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3zm0 13.5c-2.5 0-4.7-1.2-6-3.1.1-2 4-3 6-3s5.9 1 6 3c-1.3 1.9-3.5 3.1-6 3.1z"/></svg>
+        </div>
+        <h3 class="service-name">Bridal Packages</h3>
+        <p class="service-desc">Complete bridal transformation packages tailored for your special day — engagement, mehendi, wedding ceremony & reception.</p>
+        <p class="service-price">Starting from ₹ 5,000</p>
+      </div>
+      <!-- Makeup -->
+      <div class="service-card tilt reveal delay-2">
+        <span class="service-tag">Popular</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 7.5V5a2 2 0 00-2-2H6a2 2 0 00-2 2v2.5"/><path d="M12 12V4M8 12V4M16 12V4"/><rect x="4" y="11" width="16" height="9" rx="1"/></svg>
+        </div>
+        <h3 class="service-name">Make Up</h3>
+        <p class="service-desc">From natural daytime glows to dramatic evening looks and HD bridal makeup — we create art on your canvas.</p>
+        <p class="service-price">Starting from ₹ 800</p>
+      </div>
+      <!-- Skin -->
+      <div class="service-card tilt reveal delay-3">
+        <span class="service-tag">Luxury</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6"/><path d="M12 6v12M2 12h20"/></svg>
+        </div>
+        <h3 class="service-name">Skin Treatments</h3>
+        <p class="service-desc">Advanced facials, acne treatments, brightening therapies, laser hair removal, and premium skin care rituals.</p>
+        <p class="service-price">Starting from ₹ 1,200</p>
+      </div>
+      <!-- Hair -->
+      <div class="service-card tilt reveal delay-1">
+        <span class="service-tag">Expert</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 3C9 3 8 9 8 12s1 5 3 7c2-2 3-4 3-7s-1-9-1-9"/><path d="M5 7c0 0-1 3-1 5s.5 4 2 6"/><path d="M19 7c0 0 1 3 1 5s-.5 4-2 6"/></svg>
+        </div>
+        <h3 class="service-name">Hair Styling</h3>
+        <p class="service-desc">Bridal updos, blowouts, balayage, keratin treatments, hair extensions, perms, and transformative cuts by specialists.</p>
+        <p class="service-price">Starting from ₹ 500</p>
+      </div>
+      <!-- Nails -->
+      <div class="service-card tilt reveal delay-2">
+        <span class="service-tag">Premium</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8l-6-6-6 6v12a2 2 0 002 2h8a2 2 0 002-2V8z"/></svg>
+        </div>
+        <h3 class="service-name">Nail Art</h3>
+        <p class="service-desc">Manicure, pedicure, acrylic nails, gel extensions, intricate nail art for brides and everyday elegance.</p>
+        <p class="service-price">Starting from ₹ 400</p>
+      </div>
+      <!-- Wax & Spa -->
+      <div class="service-card tilt reveal delay-3">
+        <span class="service-tag">Wellness</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M8 12s1-4 4-4 4 4 4 4"/><path d="M12 8v8"/></svg>
+        </div>
+        <h3 class="service-name">Spa & Waxing</h3>
+        <p class="service-desc">Full-body waxing, Brazilian, spa massages, threading, eyebrow shaping, lash lifts, and brow lamination.</p>
+        <p class="service-price">Starting from ₹ 300</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team -->
+<section id="team">
+  <div class="container">
+    <div class="team-header reveal">
+      <p class="section-eyebrow">The Artists</p>
+      <h2 class="section-title">Meet Our<br><em style="color:var(--gold);font-style:italic">Experts</em></h2>
+      <div class="gold-divider" style="max-width:300px;margin:1rem auto"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+      <p class="section-subtitle" style="margin:1.5rem auto 0;text-align:center">A passionate team of certified beauty professionals bringing decades of combined expertise to every appointment.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal delay-1">
+        <div class="team-img-wrap">
+          <div class="team-placeholder">
+            <div class="team-avatar">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <span style="font-size:0.65rem;letter-spacing:0.3em;color:var(--text2)">BRIDAL ARTIST</span>
+          </div>
+          <div class="team-overlay">
+            <div class="team-name">Meena Patel</div>
+            <div class="team-role">Senior Bridal Makeup Artist</div>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal delay-2">
+        <div class="team-img-wrap">
+          <div class="team-placeholder" style="background:var(--dark4)">
+            <div class="team-avatar">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <span style="font-size:0.65rem;letter-spacing:0.3em;color:var(--text2)">HAIR EXPERT</span>
+          </div>
+          <div class="team-overlay">
+            <div class="team-name">Priya Shah</div>
+            <div class="team-role">Hair Styling Specialist</div>
+          </div>
+        </div>
+      </div>
+      <div class="team-card reveal delay-3">
+        <div class="team-img-wrap">
+          <div class="team-placeholder">
+            <div class="team-avatar">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <span style="font-size:0.65rem;letter-spacing:0.3em;color:var(--text2)">SKIN THERAPIST</span>
+          </div>
+          <div class="team-overlay">
+            <div class="team-name">Ritu Verma</div>
+            <div class="team-role">Skin & Beauty Therapist</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section id="gallery">
+  <div class="container">
+    <div class="gallery-header reveal">
+      <p class="section-eyebrow">Our Work</p>
+      <h2 class="section-title">Beauty<br><em style="color:var(--gold);font-style:italic">Gallery</em></h2>
+      <div class="gold-divider" style="max-width:300px;margin:1rem auto"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+    </div>
+    <div class="gallery-grid reveal" id="galleryGrid">
+      <!-- Gallery items will be inserted by script. Local images are attempted first from ./images/gallery1.jpg ... gallery6.jpg
+           If local files are missing the code falls back to picsum.photos placeholders. Add your photos to app/frontend/images/ as gallery1.jpg, gallery2.jpg, ... -->
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials">
+  <div class="container">
+    <div class="testimonials-header reveal">
+      <p class="section-eyebrow">Client Love</p>
+      <h2 class="section-title">What Brides<br><em style="color:var(--gold);font-style:italic">Say</em></h2>
+      <div class="gold-divider" style="max-width:300px;margin:1rem auto"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+      <p style="font-size:2rem;color:var(--gold);margin-top:0.5rem">⭐ 5.0 · 96 Reviews</p>
+    </div>
+  </div>
+  <div style="overflow:hidden;margin-top:2rem">
+    <div class="testimonials-track" id="testimonialTrack">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Amazing service and friendly staff! I always leave feeling pampered and refreshed. One of the best beauty parlours I've visited — clean, professional, and worth every penny."</p>
+        <div class="testimonial-author">Gajjar Jiya Vijayakumar</div>
+        <div class="testimonial-service">Bridal Package</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Hair cutting is so good! I loved it — thank you Ladli Bridal Studio. Rinkalben's expertise made me feel like a completely new person."</p>
+        <div class="testimonial-author">Rina Mahendra Purohit</div>
+        <div class="testimonial-service">Hair Cut & Styling</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Hair treatment is so good and all services are amazing. The studio is beautifully designed and the team is incredibly talented."</p>
+        <div class="testimonial-author">Nk Queen Suthar</div>
+        <div class="testimonial-service">Hair Treatment</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Best work... makeup and hair style is so good. I felt like a princess on my wedding day. The attention to detail is unmatched in Surat."</p>
+        <div class="testimonial-author">Swati Patel</div>
+        <div class="testimonial-service">Bridal Makeup</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"That's a most likely place. The overall experience was amazing, and I highly recommend it to anyone looking for top-class bridal services in Surat."</p>
+        <div class="testimonial-author">Harsh Kaklotar</div>
+        <div class="testimonial-service">Overall Experience</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"The skin care services here are exceptional. My skin has never looked better and the team made me feel so at ease throughout the whole experience."</p>
+        <div class="testimonial-author">Kavya Mehta</div>
+        <div class="testimonial-service">Skin Treatment</div>
+      </div>
+      <!-- Duplicate for seamless loop -->
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Amazing service and friendly staff! I always leave feeling pampered and refreshed. One of the best beauty parlours I've visited — clean, professional, and worth every penny."</p>
+        <div class="testimonial-author">Gajjar Jiya Vijayakumar</div>
+        <div class="testimonial-service">Bridal Package</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Hair cutting is so good! I loved it — thank you Ladli Bridal Studio."</p>
+        <div class="testimonial-author">Rina Mahendra Purohit</div>
+        <div class="testimonial-service">Hair Cut & Styling</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Hair treatment is so good and all services are amazing. The studio is beautifully designed."</p>
+        <div class="testimonial-author">Nk Queen Suthar</div>
+        <div class="testimonial-service">Hair Treatment</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Best work... makeup and hair style is so good. I felt like a princess on my wedding day."</p>
+        <div class="testimonial-author">Swati Patel</div>
+        <div class="testimonial-service">Bridal Makeup</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"That's a most likely place. The overall experience was amazing, and I highly recommend it."</p>
+        <div class="testimonial-author">Harsh Kaklotar</div>
+        <div class="testimonial-service">Overall Experience</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"The skin care services here are exceptional. My skin has never looked better."</p>
+        <div class="testimonial-author">Kavya Mehta</div>
+        <div class="testimonial-service">Skin Treatment</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Booking -->
+<section id="booking">
+  <div class="container">
+    <div class="booking-grid">
+      <div class="booking-info reveal-left">
+        <p class="section-eyebrow">Reserve Your Date</p>
+        <h2 class="section-title">Book Your<br><em style="color:var(--gold);font-style:italic">Dream Look</em></h2>
+        <div class="gold-divider" style="max-width:200px;justify-content:flex-start"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+        <p class="section-subtitle" style="margin-top:1.5rem">Reserve your appointment at Ladli Bridal Studio. Our team will confirm your booking and discuss all the details to create your perfect look.</p>
+        <div class="booking-features">
+          <div class="booking-feature">
+            <svg viewBox="0 0 24 24"><path d="M22 11.5A10 10 0 1 1 11.5 2"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Consultation included with every bridal package</span>
+          </div>
+          <div class="booking-feature">
+            <svg viewBox="0 0 24 24"><path d="M22 11.5A10 10 0 1 1 11.5 2"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Premium international products only</span>
+          </div>
+          <div class="booking-feature">
+            <svg viewBox="0 0 24 24"><path d="M22 11.5A10 10 0 1 1 11.5 2"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Ladies-only studio — your privacy guaranteed</span>
+          </div>
+          <div class="booking-feature">
+            <svg viewBox="0 0 24 24"><path d="M22 11.5A10 10 0 1 1 11.5 2"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Mobile salon service available on request</span>
+          </div>
+        </div>
+        <div style="margin-top:2.5rem;padding:1.5rem;border:1px solid rgba(201,168,76,0.15);background:rgba(201,168,76,0.03)">
+          <p style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem">Opening Hours</p>
+          <p style="font-size:0.85rem;color:var(--text2)">Monday – Saturday: 9:00 AM – 7:00 PM</p>
+          <p style="font-size:0.85rem;color:var(--text2)">Sunday: By appointment only</p>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="booking-form">
+          <p style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:2rem;color:var(--text)">Make a Reservation</p>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" placeholder="Your name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" placeholder="your@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Service</label>
+            <select class="form-select">
+              <option value="">Select a service</option>
+              <option>Bridal Package — Full Day</option>
+              <option>Bridal Makeup Only</option>
+              <option>Hair Styling</option>
+              <option>Skin Treatment / Facial</option>
+              <option>Nail Art</option>
+              <option>Waxing / Threading</option>
+              <option>Spa Services</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Preferred Time</label>
+              <select class="form-select">
+                <option>9:00 AM</option>
+                <option>10:00 AM</option>
+                <option>11:00 AM</option>
+                <option>12:00 PM</option>
+                <option>1:00 PM</option>
+                <option>2:00 PM</option>
+                <option>3:00 PM</option>
+                <option>4:00 PM</option>
+                <option>5:00 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Special Requests</label>
+            <textarea class="form-textarea" placeholder="Tell us about the occasion, look preferences, etc."></textarea>
+          </div>
+          <button class="btn-submit" onclick="alert('Thank you! We will confirm your booking shortly. 💛')">Confirm Reservation →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:4rem" class="reveal">
+      <p class="section-eyebrow">Find Us</p>
+      <h2 class="section-title">Visit the<br><em style="color:var(--gold);font-style:italic">Studio</em></h2>
+      <div class="gold-divider" style="max-width:300px;margin:1rem auto"><div class="gold-ornament" style="font-size:0.8rem">◆</div></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info reveal-left">
+        <div class="contact-item">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">Address</p>
+            <p class="contact-value">23/AB, Chikuvadi, Nirmal Nagar<br>Katargam, Surat, Gujarat 395004</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.07 2.18 2 2 0 012.07 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006 6l1.27-.95a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 15.17z"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">Phone</p>
+            <p class="contact-value">Available during studio hours<br>Mon–Sat: 9 AM – 7 PM</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">Hours</p>
+            <p class="contact-value">Monday – Saturday: 9:00 AM – 7:00 PM<br>Sunday: By appointment</p>
+          </div>
+        </div>
+        <div>
+          <p class="contact-label" style="margin-bottom:1rem">Follow Us</p>
+          <div class="social-links">
+            <a href="#" class="social-link" title="Instagram">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" class="social-link" title="Facebook">
+              <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+            </a>
+            <a href="#" class="social-link" title="WhatsApp">
+              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+            </a>
+            <a href="https://maps.google.com/?q=Ladli+Bridal+Studio+Katargam+Surat" class="social-link" title="Google Maps">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="map-container">
+          <div class="map-placeholder">
+            <div class="map-pin">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <p class="map-address">
+              <strong>Ladli Bridal Studio</strong><br>
+              23/AB, Chikuvadi, Nirmal Nagar<br>
+              Katargam, Surat — 395004<br>
+              <br>
+              <span style="font-size:0.7rem;letter-spacing:0.2em;color:var(--gold)">⭐ 5.0 · 96 Google Reviews</span>
+            </p>
+            <a href="https://maps.google.com/?q=23+AB+Chikuvadi+Nirmal+Nagar+Katargam+Surat+Gujarat+395004" target="_blank" style="display:inline-block;margin-top:1.5rem;padding:0.7rem 1.5rem;border:1px solid var(--gold);color:var(--gold);font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;text-decoration:none;transition:all 0.3s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--dark)'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">
+              Open in Google Maps →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">LADLI BRIDAL STUDIO</div>
+      <p class="footer-copy">© 2025 Ladli Bridal Studio · Katargam, Surat</p>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#booking">Booking</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating CTA -->
+<button class="floating-badge" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book Now</button>
+
+<script>
+// Loader
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+  },3000);
+});
+
+// Cursor
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;
+  ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('button,a,.service-card,.team-card,.social-link').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(3)';ring.style.opacity='0'});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';ring.style.opacity='1'});
+});
+
+// Nav scroll
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>80);
+});
+
+// Hero canvas — particle system
+const canvas=document.getElementById('hero-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();
+window.addEventListener('resize',resize);
+class Particle{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.size=Math.random()*2+0.5;
+    this.speedX=(Math.random()-0.5)*0.4;
+    this.speedY=(Math.random()-0.5)*0.4;
+    this.opacity=Math.random()*0.5+0.1;
+    this.life=0;
+    this.maxLife=Math.random()*200+100;
+    this.gold=Math.random()>0.7;
+  }
+  update(){
+    this.x+=this.speedX;this.y+=this.speedY;
+    this.life++;
+    if(this.life>this.maxLife||this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){
+    const fade=this.life<20?this.life/20:this.life>this.maxLife-20?(this.maxLife-this.life)/20:1;
+    ctx.globalAlpha=this.opacity*fade;
+    ctx.fillStyle=this.gold?'#C9A84C':'#ffffff';
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();
+  }
+}
+for(let i=0;i<150;i++)particles.push(new Particle());
+
+// Mouse influence
+let mouseX=W/2,mouseY=H/2;
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
+
+function drawConnections(){
+  particles.forEach((p,i)=>{
+    particles.slice(i+1).forEach(p2=>{
+      const d=Math.hypot(p.x-p2.x,p.y-p2.y);
+      if(d<100){
+        ctx.globalAlpha=0.03*(1-d/100);
+        ctx.strokeStyle='#C9A84C';
+        ctx.lineWidth=0.5;
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+      }
+    });
+  });
+}
+
+function drawGoldCircles(){
+  const t=Date.now()*0.001;
+  [0.3,0.2,0.1].forEach((opacity,i)=>{
+    const r=150+i*80+Math.sin(t*0.5+i)*20;
+    const x=W/2+Math.sin(t*0.3+i)*30;
+    const y=H/2+Math.cos(t*0.4+i)*20;
+    ctx.globalAlpha=opacity*0.15;
+    ctx.strokeStyle='#C9A84C';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
+  });
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  ctx.globalAlpha=1;
+  const grad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)/2);
+  grad.addColorStop(0,'rgba(20,14,6,0.98)');
+  grad.addColorStop(1,'rgba(5,3,2,1)');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  drawGoldCircles();
+  drawConnections();
+  particles.forEach(p=>{p.update();p.draw();});
+  ctx.globalAlpha=1;
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Reveal on scroll
+const revealEls=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.stat-card');
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible','in-view');}
+  });
+},{threshold:0.15});
+revealEls.forEach(el=>io.observe(el));
+
+// 3D tilt effect
+document.querySelectorAll('.tilt').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-0.5;
+    const y=(e.clientY-r.top)/r.height-0.5;
+    card.style.transform=`perspective(1000px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateZ(10px)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='perspective(1000px) rotateY(0) rotateX(0) translateZ(0)';
+  });
+});
+
+// Counter animation
+function animateCount(el,target){
+  let start=0;
+  const dur=1500;
+  const step=timestamp=>{
+    if(!start)start=timestamp;
+    const progress=(timestamp-start)/dur;
+    const cur=Math.min(Math.floor(progress*target),target);
+    const text=el.textContent;
+    const suffix=text.replace(/[0-9]/g,'').replace(String(Math.floor(progress*target)),'');
+    el.textContent=cur+(el.dataset.suffix||'');
+    if(progress<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// Sparkle on gold elements
+function createSparkle(x,y){
+  const s=document.createElement('div');
+  s.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:4px;height:4px;background:#C9A84C;border-radius:50%;pointer-events:none;z-index:9997;animation:sparkle 0.6s ease forwards`;
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),600);
+}
+document.addEventListener('click',e=>{
+  for(let i=0;i<6;i++){
+    setTimeout(()=>createSparkle(e.clientX+(Math.random()-0.5)*30,e.clientY+(Math.random()-0.5)*30),i*50);
+  }
+});
+
+// Dynamic gallery loader: tries local images first, falls back to picsum placeholders
+;(function renderGallery(){
+  const gallery = document.getElementById('galleryGrid');
+  if(!gallery) return;
+  const labels = ['Bridal Look','Updo','Facial Treatment','Evening Look','Nail Design','Studio Interior'];
+  for(let i=1;i<=6;i++){
+    const item=document.createElement('div');item.className='gallery-item';
+    const placeholder=document.createElement('div');placeholder.className='gallery-placeholder';
+    const img=document.createElement('img');
+    const localPath=`images/gallery${i}.jpg`;
+    // attempt to load local image first
+    const tester=new Image();
+    tester.onload=()=>{ img.src=localPath; };
+    tester.onerror=()=>{ img.src=`https://picsum.photos/seed/ladli${i}/1200/900`; };
+    tester.src=localPath;
+    placeholder.appendChild(img);
+    const label=document.createElement('div');label.className='gallery-label';label.textContent=labels[i-1]||('Image '+i);
+    item.appendChild(placeholder);
+    item.appendChild(label);
+    gallery.appendChild(item);
+  }
+})();
+</script>
+</body>
+</html>
