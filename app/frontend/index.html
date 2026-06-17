@@ -936,21 +936,18 @@ document.addEventListener('click',e=>{
   }
 });
 
-// Dynamic gallery loader: tries local images first, falls back to picsum placeholders
+// Dynamic gallery loader: uses custom image URL
 ;(function renderGallery(){
   const gallery = document.getElementById('galleryGrid');
   if(!gallery) return;
-  const labels = ['Bridal Look','Updo','Facial Treatment','Evening Look','Nail Design','Studio Interior'];
-  for(let i=1;i<=6;i++){
+  const labels = ['Bridal Look'];
+  const imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTo-9lkNI3-cnKN7zPo_C1E3EBm-L-PG1BOcn-M5lwGSw&s=10';
+  
+  for(let i=0;i<1;i++){
     const item=document.createElement('div');item.className='gallery-item';
     const placeholder=document.createElement('div');placeholder.className='gallery-placeholder';
     const img=document.createElement('img');
-    const localPath=`images/gallery${i}.jpg`;
-    // attempt to load local image first
-    const tester=new Image();
-    tester.onload=()=>{ img.src=localPath; };
-    tester.onerror=()=>{ img.src=`https://picsum.photos/seed/ladli${i}/1200/900`; };
-    tester.src=localPath;
+    img.src=imageUrl;
     placeholder.appendChild(img);
     const label=document.createElement('div');label.className='gallery-label';label.textContent=labels[i-1]||('Image '+i);
     item.appendChild(placeholder);
