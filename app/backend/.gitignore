@@ -1,0 +1,11 @@
+node_modules/
+.env
+logs/
+src/uploads/*
+!src/uploads/.gitkeep
+docker/ssl/
+coverage/
+.DS_Store
+*.log
+dist/
+.nyc_output/
